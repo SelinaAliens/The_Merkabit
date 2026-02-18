@@ -1,0 +1,122 @@
+[README (2).md](https://github.com/user-attachments/files/25383000/README.2.md)
+# Merkabit Simulations
+
+Computational validation code for:
+
+**The Merkabit: A Ternary Computational Unit on the Eisenstein Lattice**
+Selina Stenberg & Claude (Anthropic), 2026
+
+This repository contains every simulation referenced in the paper's appendices. All scripts produce deterministic output with fixed random seeds and require only Python 3.8+ and NumPy.
+
+---
+
+## Scripts
+
+| Script | Appendix | Paper Sections | What it does |
+|--------|----------|----------------|--------------|
+| `pentachoric_code_simulation.py` | C | 9.2, 9.5 | Static pentachoric detection on the 7-node Eisenstein cell. Exhaustive enumeration of all 5⁷ = 78,125 gate assignments × 28 error scenarios. |
+| `dynamic_pentachoric_simulation.py` | C | 9.5, 9.8 | Dynamic detection with ouroboros gate rotation active. Validates the dynamic detection rates (95.1% overall, 100% central) and composite suppression (41–68×). |
+| `lattice_scaling_simulation.py` | D | 9.7 | Extends detection analysis to 19-node and 37-node Eisenstein cells via Monte Carlo. Tests whether detection improves with the interior-to-boundary ratio. Provides the `EisensteinCell` class used by all lattice-based simulations. |
+| `optimal_gate_assignment.py` | D | 9.7 | Minimax optimisation: finds the gate assignment that maximises the worst-case detection rate. Exhaustive on 7-node cell; simulated annealing on 19- and 37-node cells. |
+| `pentachoric_decoder_simulation.py` | E | 9.7 | Majority-vote decoder baseline. Converts pentachoric closure failures into error localisation and correction. |
+| `gateaware_decoder_simulation.py` | E | 9.7 | Gate-aware decoder with consistency checks, exclusion principle, and time-series validation. Improves correction fidelity by ~12 percentage points over majority-vote. |
+| `e6_syndrome_decoder_simulation.py` | F | 10 | Level 3 error correction via the E₆ root system. Implements the full decoding pipeline: sector identification → root direction → correction gate. |
+| `noise_model_decomposition.py` | G | 10.10.1 | Decomposes platform-specific noise (superconducting, photonic, trapped ion) into the 7 syndrome sectors of the P₂₄ representation ring. Three-level composite suppression analysis. |
+| `threshold_sweep_simulation.py` | H | 9.7, 10.10.4 | Fault-tolerance threshold identification. Sweeps raw error rate from 10⁻¹ to 10⁻⁴ across cell sizes to find the crossing point where scaling helps. |
+| `pf_gate_simulation.py` | I | 8.1–8.2 | Verification of the P and F gates — the two single-merkabit gates with no qubit analogue. Tests unitarity, ternary navigation, frequency–phase duality, commutation relations, ouroboros period-12, and the state-space reachability proof. |
+| `native_algorithm_benchmarks.py` | J | 8.9.5 | Gate-cost benchmarks comparing merkabit vs qubit across five problem classes: ternary search, long-range coupling, graph colouring, reversible computation, and zero-state controlled operations. |
+
+---
+
+## Dependencies
+
+```
+numpy>=1.20
+```
+
+Install:
+```bash
+pip install numpy
+```
+
+No other packages are required. All scripts are self-contained except those that import from `lattice_scaling_simulation.py` (the shared Eisenstein cell infrastructure).
+
+---
+
+## Dependency Graph
+
+```
+lattice_scaling_simulation.py  ← shared infrastructure (EisensteinCell class)
+    ├── optimal_gate_assignment.py
+    ├── pentachoric_decoder_simulation.py
+    ├── gateaware_decoder_simulation.py
+    ├── e6_syndrome_decoder_simulation.py
+    ├── noise_model_decomposition.py
+    └── threshold_sweep_simulation.py
+
+pf_gate_simulation.py          ← fully self-contained
+native_algorithm_benchmarks.py ← fully self-contained
+```
+
+---
+
+## Running
+
+Each script runs independently and prints results to stdout:
+
+```bash
+python3 lattice_scaling_simulation.py
+python3 optimal_gate_assignment.py
+python3 pentachoric_decoder_simulation.py
+python3 gateaware_decoder_simulation.py
+python3 e6_syndrome_decoder_simulation.py
+python3 noise_model_decomposition.py
+python3 threshold_sweep_simulation.py
+python3 pf_gate_simulation.py
+python3 native_algorithm_benchmarks.py
+```
+
+All scripts use fixed random seeds (`RANDOM_SEED = 42` or equivalent) and produce identical output across platforms. Typical runtime per script: 1–30 minutes on a single CPU core. Peak memory usage: < 4 GB.
+
+---
+
+## Reproducing Paper Results
+
+Each appendix in the paper opens with a status line identifying the script(s) that produced its results. For example:
+
+> **Appendix D:** "All results are reproducible from lattice_scaling_simulation.py and optimal_gate_assignment.py."
+
+Running the named script(s) reproduces the tables reported in that appendix.
+
+---
+
+## Key Results
+
+| Result | Script | Finding |
+|--------|--------|---------|
+| Dynamic detection rate | `dynamic_pentachoric_simulation.py` | 95.1% overall, 100% central (τ ≥ 5) |
+| Detection scaling | `lattice_scaling_simulation.py` | 95.1% → 98.0% → 98.9% at 7/19/37 nodes |
+| Optimal detection floor | `optimal_gate_assignment.py` | 100% (no single-error blind spots) |
+| Gate-aware correction | `gateaware_decoder_simulation.py` | 96.4% correction fidelity at 37 nodes |
+| Composite suppression | `noise_model_decomposition.py` | 500–1,800× (three levels combined) |
+| Fault-tolerance threshold | `threshold_sweep_simulation.py` | ~5% (Level 2), ~7–12% (Levels 1+2) |
+| Qubit subspace confinement | `pf_gate_simulation.py` | {Rₓ, Rz} phase drift = exactly 0 after 1,000 gates |
+| F gate depth advantage | `native_algorithm_benchmarks.py` | O(d) → O(1) per long-range interaction |
+
+---
+
+## Citation
+
+```bibtex
+@article{stenberg2026merkabit,
+  title={The Merkabit: A Ternary Computational Unit on the Eisenstein Lattice},
+  author={Stenberg, Selina and Claude (Anthropic)},
+  year={2026}
+}
+```
+
+---
+
+## License
+
+Copyright Selina Stenberg 2026. All rights reserved.
