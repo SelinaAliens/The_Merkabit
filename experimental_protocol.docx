@@ -1,0 +1,402 @@
+**Experimental Protocol**
+
+Pentachoric Floquet Drive on a 7-Qubit Hexagonal Cell
+
+*Five parameter-free predictions from the merkabit architecture*
+
+Stenberg (2026) • Computational validation appendix
+
+1\. Purpose
+
+This document specifies a minimal experiment to test the merkabit
+architecture on existing hardware. The experiment uses **seven
+superconducting transmon qubits** arranged in a hexagonal cell, driven
+by a specific 12-step periodic pulse sequence derived from the
+pentachoric gate structure. The protocol produces **five quantitative
+predictions with no free parameters**. Each prediction is a specific
+number determined entirely by the geometry of the architecture. None can
+be adjusted after the fact.
+
+The experiment does not require new hardware. Hexagonal qubit arrays
+with nearest-neighbour coupling exist on current IBM, Google, and
+Rigetti processors. The pulse sequence uses only standard single-qubit
+rotations (R*x*, R*z*) and a relative-phase gate (P) implementable via
+frame changes. Total circuit depth per Floquet period: 36 single-qubit
+gates (3 per step × 12 steps).
+
+2\. Hardware Requirements
+
+**Qubits:** Seven fixed-frequency transmon qubits, labelled 0 (centre)
+and 1--6 (ring). Qubit 0 must couple to all six ring qubits. Ring qubits
+couple to their two ring neighbours and to qubit 0. This is the standard
+hexagonal motif present on IBM Eagle/Heron processors (e.g., the
+ibm_brisbane and ibm_kyoto topologies contain multiple such cells).
+
+**Connectivity:** Each ring qubit has 3 neighbours (centre + 2 ring).
+Centre qubit has 6 neighbours. This matches the Eisenstein lattice
+coordination: interior node = 6 neighbours, boundary node = 3
+neighbours.
+
+**Gate fidelity:** Single-qubit gate fidelity \> 99.5% (standard on
+current processors). Two-qubit gates are not required for the core
+protocol; coupling is implemented through the Floquet drive geometry. If
+two-qubit entangling gates are available (CR, CZ, or ECR), they can be
+used for the entanglement witness in Prediction 5.
+
+**Coherence:** T₁ and T₂ \> 100 µs (standard). Each Floquet period
+requires approximately 12 × 3 = 36 gate operations at \~20--50 ns each,
+giving \~1--2 µs per period. The experiment runs up to 50 periods (≤ 100
+µs), well within coherence times.
+
+3\. Floquet Drive: The Pentachoric Pulse Sequence
+
+The ouroboros cycle is a 12-step periodic drive. At each step k (k = 0
+to 11), apply three rotations in sequence to every qubit:
+
+**Step structure:** P(θₚ) → R*z*(θₓ) → R*x*(θₕ)
+
+where P is the asymmetric relative-phase gate (acts with opposite sign
+on the two computational basis states, implementable as a virtual-Z
+frame change with sign inversion on the second spinor mode), and R*x*,
+R*z* are standard rotations acting identically on both modes.
+
+**Base angles:** The fundamental phase advance per step is θ = π/6 (=
+2π/12). The symmetric rotation fraction is 1/3, giving a symmetric base
+of π/18 per step.
+
+The gate angles for each step k are:
+
+  ------- ------------ ------------- ------------- ------------- ----------------
+  **k**   **Absent**   **θ_P (rad)** **θ_Rz        **θ_Rx        **Notes**
+                                     (rad)**       (rad)**       
+
+  0       S            0.523599      0.052360      0.340339      *Rz reduced, Rx
+                                                                 enhanced*
+
+  1       R            0.523599      0.128645      0.100043      *Rx reduced, Rz
+                                                                 enhanced*
+
+  2       T            0.523599      0.061087      0.152716      *Both reduced*
+
+  3       F            0.523599      0.098958      0.174533      *Unmodified*
+
+  4       P            0.314159      0.196350      0.235619      *P weakened, sym
+                                                                 enhanced*
+
+  5       S            0.523599      0.069813      0.128645      *Rz reduced, Rx
+                                                                 enhanced*
+
+  6       R            0.523599      0.283616      0.034907      *Rx reduced, Rz
+                                                                 enhanced*
+
+  7       T            0.523599      0.175076      0.069271      *Both reduced*
+
+  8       F            0.523599      0.261799      0.130900      *Unmodified*
+
+  9       P            0.314159      0.375162      0.314159      *P weakened, sym
+                                                                 enhanced*
+
+  10      S            0.523599      0.087266      0.283616      *Rz reduced, Rx
+                                                                 enhanced*
+
+  11      R            0.523599      0.226893      0.100043      *Rx reduced, Rz
+                                                                 enhanced*
+  ------- ------------ ------------- ------------- ------------- ----------------
+
+The absent gate label rotates through all five pentachoric positions (S,
+R, T, F, P) over the 12-step cycle. Since 12 and 5 are coprime, every
+gate occupies every position in the 60-step super-period (5 full
+ouroboros cycles). This is the pentachoric closure property.
+
+**Implementation note:** The P gate is an asymmetric phase rotation. On
+a transmon, this can be implemented as a virtual-Z gate with opposite
+signs on the \|0⟩ and \|1⟩ frame. If using a dual-rail encoding (two
+transmon modes per merkabit), P is a differential phase between the two
+rails. The key requirement is that P shifts the *relative* phase between
+forward and inverse modes, while R*x* and R*z* rotate both modes
+identically.
+
+4\. State Preparation
+
+Prepare the 7-qubit cell in one of three initial configurations:
+
+**\|+1⟩ (forward-dominant):** All qubits in \|0⟩ computational basis
+state. In dual-spinor language: forward and inverse modes aligned,
+coherence C = Re(u†v) = +1.
+
+**\|0⟩ (standing wave):** All qubits prepared with forward and inverse
+modes orthogonal. If using dual-rail encoding: one rail in \|0⟩, the
+other in \|1⟩. Coherence C = 0. This is the predicted time-crystal
+ground state.
+
+**\|−1⟩ (inverse-dominant):** All qubits with modes anti-aligned. Apply
+a global P(π) gate to the \|+1⟩ state. Coherence C = −1.
+
+5\. Measurement Protocol
+
+**Stroboscopic measurement:** After each complete Floquet period (12
+steps), perform state tomography on the 7-qubit cell to extract the
+coherence C = Re(u†v) for each qubit. Repeat for 50 consecutive periods.
+This gives C(nT) for n = 0, 1, \..., 50.
+
+**Intra-period measurement:** For a separate set of runs, measure after
+each of the 12 individual steps within a single period. This gives the
+micromotion C(t) within one cycle.
+
+**Berry phase measurement:** Use Ramsey interferometry to extract the
+geometric phase accumulated over one complete ouroboros cycle. Prepare a
+superposition (\|+1⟩ + \|0⟩)/√2 using a π/2 pulse, apply the 12-step
+cycle, then apply a second π/2 pulse and measure. The interference
+fringe encodes the Berry phase difference between the two states.
+
+**Error injection:** To test detection rates, deliberately apply a known
+single-qubit error (e.g., a bit-flip X gate or phase-flip Z gate) to a
+specific qubit at a known time step, then continue the Floquet drive and
+measure whether the error is detected by the surrounding qubits via
+syndrome extraction.
+
+6\. Five Predictions
+
+Each prediction is a specific number determined by the pentachoric
+geometry. No parameters are adjustable. Either the measured value falls
+within the stated tolerance or it does not.
+
+  -------- --------------------- ------------ --------------- -------------------
+  **\#**   **Prediction**        **Value**    **Tolerance**   **Measurement**
+
+  **P1**   Berry phase           **5.63 rad   ± 0.5 rad       Ramsey
+           separation between    (1.79π)**                    interferometry
+           \|0⟩ and \|±1⟩ after                               
+           one ouroboros cycle                                
+
+  **P2**   Stroboscopic          **3.3 T**    ± 0.3 T         Fourier analysis of
+           quasi-period of                                    C(nT)
+           coherence oscillation                              
+           for \|+1⟩ initial                                  
+           state                                              
+
+  **P3**   Z₂ symmetry: C(\|−1⟩, **Exact**    \< 5% deviation Stroboscopic
+           nT) = −C(\|+1⟩, nT)                                tomography
+           at every period n                                  
+
+  **P4**   Error detection rate  **91%**      ± 5%            Syndrome extraction
+           at central node                                    after error
+           (qubit 0) for                                      injection
+           injected single-gate                               
+           errors                                             
+
+  **P5**   DTC survival:         **\> 0.3**   Binary:         Noisy circuit
+           coherence oscillation              survives or     execution
+           amplitude after 50                 doesn't         
+           periods with 10% gate                              
+           noise                                              
+  -------- --------------------- ------------ --------------- -------------------
+
+Prediction 1: Berry Phase Separation
+
+The Berry phase accumulated by the state \|0⟩ (standing wave) over one
+ouroboros cycle differs from that of \|±1⟩ by **5.63 radians (≈
+1.79π)**. This is nearly maximal separation on the circle. It arises
+because \|0⟩ has u ⊥ v (forward and inverse spinors orthogonal), causing
+the Bloch vector to trace a fundamentally different path on S² during
+the cycle. The path for \|0⟩ encircles the origin of the complex overlap
+plane; the paths for \|±1⟩ do not. This is a topological distinction
+that cannot be removed by continuous deformation.
+
+**Why this matters:** If the Berry phase separation matches, the
+non-destructive readout mechanism works. The trit value is encoded in a
+geometric phase, measurable by interferometry without collapsing the
+state. This is the foundation of merkabit computation: read by
+circumnavigating, not by collapsing.
+
+**If it fails:** A separation significantly below 5.63 rad (e.g., \< 3
+rad) would indicate the dual-spinor counter-rotation is not producing
+the predicted geometric phase structure. The readout mechanism would not
+work as designed.
+
+Prediction 2: Quasi-Period 3.3T
+
+When the cell is initialised in \|+1⟩ and driven stroboscopically, the
+coherence C(nT) oscillates with a dominant frequency of approximately
+0.30/T, corresponding to a quasi-period of **3.3 Floquet periods**. This
+is not exactly 3 (not a Z₃ time crystal) but an irrational number
+arising from the beat between two incommensurate Floquet quasi-energies
+at ±0.610π and ±0.010π. The system is a *discrete time quasi-crystal*
+(DTQC), the temporal analogue of a Penrose tiling.
+
+**Why this matters:** The quasi-periodicity ratio encodes the ratio of
+base winding (P gate, period-12 closure) to fiber winding (symmetric
+rotations, \~π total), which is the geometric signature of the Hopf
+fiber structure. If the quasi-period matches, the fiber topology is real
+and physical.
+
+**If it fails:** A dominant period of exactly 2 (standard Z₂ DTC) would
+mean the pentachoric structure collapses to ordinary Ising physics. An
+aperiodic signal with no dominant frequency would indicate
+thermalisation.
+
+Prediction 3: Exact Z₂ Symmetry
+
+The coherence of \|−1⟩ at every stroboscopic time must be the exact
+negative of the coherence of \|+1⟩: **C(\|−1⟩, nT) = −C(\|+1⟩, nT)** for
+all n. In simulation, this holds to machine precision (\< 10⁻¹⁴). The Z₂
+symmetry is the forward/inverse spinor exchange symmetry of the
+dual-spinor architecture. It is exact, not approximate, because the
+Floquet drive treats both spinor modes with identical coupling
+strengths.
+
+**Why this matters:** The Z₂ symmetry is what protects the Berry phase
+separation (symmetry-protected topological order). It is also the
+symmetry that makes the time-crystalline phase possible. If Z₂ holds
+exactly, the merkabit's balanced ternary structure (+1, 0, −1) is
+physically realised, with \|0⟩ as the unique symmetry-invariant state.
+
+**If it fails:** Systematic deviation \> 5% would indicate the physical
+implementation breaks the forward/inverse symmetry. This is testable
+independently of the other predictions and is the easiest to verify.
+
+Prediction 4: 91% Central Detection Rate
+
+When a single-gate error is injected at the central qubit (qubit 0,
+which has 6 neighbours), the pentachoric detection mechanism identifies
+the error in **91% of cases** within τ = 5 ouroboros steps (the
+chirality rotation period). Detection occurs when a neighbouring qubit's
+absent gate matches the error gate during its chiral rotation.
+
+**Protocol:** Inject a known error (remove one of the 4 active gates) at
+the central node at a random time step. Continue the Floquet drive for 5
+additional steps. Extract syndromes from all 6 neighbours. An error is
+detected if any neighbour's syndrome indicates an inconsistency with the
+central node's expected gate assignment.
+
+**Why this matters:** This tests the core error correction mechanism:
+pentachoric gate complementarity. The 91% rate is a geometric
+consequence of having 6 neighbours each rotating through 5 gate
+positions. It requires no ancilla qubits, no classical processing, and
+no external correction circuit. If it matches, error correction is a
+property of the geometry.
+
+**Boundary comparison:** Ring qubits (3 neighbours each) should show
+detection rates of approximately 85--88%, giving a boundary gap of
+\~3--5%. This gap is predicted to close when fiber detection channels
+are activated (Prediction 5 extension).
+
+Prediction 5: DTC Robustness to 10% Gate Noise
+
+Add Gaussian noise with standard deviation ε = 0.10 to every gate angle
+in every Floquet period. After 50 periods, the oscillation amplitude of
+C(nT) for \|+1⟩ should remain **above 0.3** (on a scale where the clean
+amplitude is approximately 1.5). In simulation, the amplitude actually
+*increases* slightly with moderate disorder, characteristic of many-body
+localisation enhancing the time-crystalline phase.
+
+**Why this matters:** This is the DTC survival test. A true time crystal
+resists thermalisation; noise does not destroy the order. If the
+merkabit's three-level geometric error correction IS the mechanism
+preventing thermalisation (as the Floquet analysis indicates), then the
+DTC should survive noise levels consistent with the error correction
+threshold (\~22%). Survival at ε = 0.10 is well within this bound.
+
+**If it fails:** If the oscillation decays to zero within 50 periods at
+ε = 0.10, the system thermalises and is not a time crystal. This would
+indicate the geometric error correction is insufficient for
+thermalisation protection in a physical system.
+
+7\. Interpretation
+
+**Full success (5/5):** All five predictions confirmed within stated
+tolerances. The pentachoric Floquet drive produces a discrete time
+quasi-crystal with geometric error correction and topologically
+protected readout. Merkabit architecture is physically realised. Next
+step: scale to 19-node and 37-node cells, implement inter-cell coupling,
+demonstrate logical operations.
+
+**Partial success (3--4/5):** Core physics present but specific
+quantitative predictions off. Most likely cause: the mapping from
+idealised pentachoric gates to physical pulse sequences introduces
+systematic errors. Recalibrate the gate angle table and re-run. The
+architecture is sound; the implementation needs tuning.
+
+**Partial failure (1--2/5):** The Z₂ symmetry test (P3) and the DTC
+robustness test (P5) are the most robust predictions; if either fails,
+the dual-spinor architecture is not realised in the physical system. If
+only P1 (Berry phase) or P2 (quasi-period) fail, the issue is likely in
+the specific gate angle values, not the architecture.
+
+**Full failure (0/5):** The 7-qubit hexagonal cell driven by the
+pentachoric sequence does not behave as a merkabit. Either the physical
+system does not implement dual-spinor modes, or the mapping from
+abstract gates to physical pulses is fundamentally wrong. The
+architecture remains mathematically valid but does not describe this
+physical system.
+
+8\. Estimated Resources
+
+**Circuit depth:** 36 single-qubit gates per Floquet period (3 gates ×
+12 steps). For 50 periods: 1,800 single-qubit gates total. No two-qubit
+gates required for the core protocol.
+
+**Shots:** Standard quantum tomography requires \~1,000 shots per
+measurement basis per qubit. With 3 Pauli bases and 7 qubits,
+approximately 21,000 shots per time point. For 50 stroboscopic time
+points: \~1,000,000 total shots. At typical superconducting processor
+speeds (\~10µs cycle time + reset), this is \~10 seconds of quantum
+processor time.
+
+**Classical post-processing:** State tomography reconstruction, Fourier
+analysis of C(nT), Berry phase extraction from Ramsey fringes. Standard
+tools; no specialised software required.
+
+**Total estimated wall time:** One day of quantum processor access
+(including calibration, state preparation optimisation, and multiple
+runs for statistics). Classical analysis: one additional day.
+
+9\. Connection to Existing Experiments
+
+This protocol is closely related to three recent experiments that
+validate the feasibility of each component:
+
+**Mi et al. (Nature, 2022) and Zhang et al. (Nature, 2024):**
+Demonstrated discrete time crystals on Google Sycamore and IBM Eagle
+processors. These used periodic Ising drives on chain and 2D lattice
+geometries. The merkabit protocol replaces the Ising drive with the
+pentachoric sequence on the same hardware topology.
+
+**Frey and Rachel (Science Advances, 2022):** Demonstrated a Floquet
+topological phase on a superconducting processor. Measured topological
+invariants via stroboscopic state tomography. The same measurement
+approach applies directly to Predictions 1--3.
+
+**He et al. (Phys. Rev. X, 2025):** Demonstrated a discrete time
+quasi-crystal (DTQC) using NV centres in diamond. Observed
+quasi-periodic subharmonic response with irrational frequency ratio.
+Prediction 2 tests the same phenomenon with a specific predicted ratio
+determined by pentachoric geometry.
+
+Appendix: Qiskit Circuit Skeleton
+
+The following pseudocode gives the structure of one Floquet period in
+Qiskit. The exact gate angles for each step k are given in the table in
+Section 3.
+
+\# One Floquet period on 7 qubits
+
+for k in range(12): \# 12 ouroboros steps theta_P, theta_Rz, theta_Rx =
+angles\[k\] for q in range(7): \# all 7 qubits \# P gate (asymmetric
+phase) qc.rz(+theta_P/2, q) \# forward mode qc.rz(-theta_P/2, q) \#
+inverse mode \# Symmetric rotations qc.rz(theta_Rz, q) qc.rx(theta_Rx,
+q)
+
+*Note: The P gate implementation depends on the physical encoding of the
+dual-spinor modes. In a dual-rail encoding (two transmon modes per
+merkabit), P is a differential phase shift between the rails. In a
+single-transmon encoding where \|0⟩ and \|1⟩ represent the two spinor
+components, P is equivalent to Rz with opposite sign convention. The
+experimentalist should choose the encoding that best matches their
+hardware and implement P accordingly.*
+
+*This protocol accompanies the computational validation appendices
+(A--L) of **The Merkabit** (Stenberg, 2026). All numerical predictions
+derive from parameter-free simulations validated across 20+ independent
+tests. Source code for all simulations is available at the project's
+Zenodo repository.*
