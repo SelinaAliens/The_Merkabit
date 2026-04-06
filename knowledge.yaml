@@ -1,0 +1,794 @@
+kcp_version: "0.6"
+project: "The_Merkabit"
+description: >
+  Foundation repository for the Merkabit architecture: two counter-rotating spinors
+  locked into a standing wave on an Eisenstein hexagonal lattice. Provides five
+  native gates (R, S, T, Z6, Z62), built-in three-layer error correction, and
+  numerical verification of α=1/137 derivation, PSL(2,7) geometry, spinor dynamics,
+  and error-correction properties.
+version: "1.0"
+created: "2026-04-06"
+maintainer: "Selina Stenberg"
+
+# ─── UNITS ────────────────────────────────────────────────────────────────────
+units:
+
+  # ORIENTATION
+  - id: readme
+    path: README.md
+    intent: "Entry point: defines the merkabit unit as two counter-rotating spinors, five gates, hexagonal lattice, three-layer error correction"
+    scope: "architecture summary"
+    audience: ["newcomer", "physicist", "engineer"]
+    validated: true
+    hints:
+      load_strategy: eager
+      token_estimate: 50
+      priority: high
+
+  - id: readme-simulations
+    path: README_Simulations
+    intent: "Summary of all simulation scripts, their purpose and output files"
+    scope: "simulation guide"
+    audience: ["engineer", "researcher"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 200
+      priority: medium
+
+  # FINE STRUCTURE CONSTANT α — DERIVATION AND VERIFICATION
+  - id: alpha-berry-phase
+    path: alpha_from_berry_phase.py
+    intent: "Primary derivation of α=1/137 from Berry phase accumulated over PSL(2,7) orbit"
+    scope: "α derivation — Berry phase approach"
+    audience: ["physicist", "mathematician"]
+    validated: true
+    depends_on: [readme]
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: high
+    triggers:
+      - "fine structure constant"
+      - "alpha 137"
+      - "Berry phase"
+      - "alpha derivation"
+
+  - id: alpha-berry-deep-dive
+    path: alpha_berry_deep_dive.py
+    intent: "Extended Berry phase analysis, sensitivity testing, path-dependence verification"
+    scope: "α derivation — extended analysis"
+    audience: ["physicist"]
+    validated: true
+    depends_on: [alpha-berry-phase]
+    hints:
+      load_strategy: lazy
+      token_estimate: 200
+      priority: medium
+    triggers:
+      - "fine structure constant"
+      - "Berry phase sensitivity"
+
+  - id: ouroboros-berry-phase
+    path: ouroboros_berry_phase_simulation.py
+    intent: "Ouroboros cycle Berry phase simulation — closed orbit in PSL(2,7) phase space"
+    scope: "α derivation — Ouroboros cycle"
+    audience: ["physicist"]
+    validated: true
+    depends_on: [alpha-berry-phase]
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "Ouroboros"
+      - "closed orbit"
+      - "Berry phase"
+
+  - id: ouroboros-berry-extended
+    path: ouroboros_berry_extended.py
+    intent: "Extended Ouroboros cycle analysis with higher-order corrections"
+    scope: "α derivation — extended Ouroboros"
+    audience: ["physicist"]
+    validated: true
+    depends_on: [ouroboros-berry-phase]
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+
+  - id: algebraic-closure
+    path: algebraic_closure_test.py
+    intent: "Tests algebraic closure of PSL(2,7) gate set; verifies 168-element group structure"
+    scope: "PSL(2,7) algebraic verification"
+    audience: ["mathematician", "physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 100
+      priority: medium
+    triggers:
+      - "PSL(2,7)"
+      - "group theory"
+      - "168 elements"
+      - "algebraic closure"
+
+  - id: merkabit-verification
+    path: merkabit_verification.py
+    intent: "Master verification script — runs core architectural checks: gate set completeness, error correction layers, α convergence"
+    scope: "overall architectural verification"
+    audience: ["engineer", "physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 200
+      priority: high
+    triggers:
+      - "verification"
+      - "reproduce results"
+      - "check claims"
+
+  # SPINOR GEOMETRY AND HOPF FIBRATION
+  - id: hopf-fiber-bridge
+    path: hopf_fiber_bridge.py
+    intent: "Maps merkabit dual-spinor (u,v) ∈ S³×S³ to Hopf fibration; derives hexagonal projection"
+    scope: "spinor geometry — Hopf fibration"
+    audience: ["physicist", "mathematician"]
+    validated: true
+    depends_on: [readme]
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "Hopf fibration"
+      - "spinor"
+      - "S3"
+      - "dual spinor"
+      - "hexagonal lattice"
+
+  - id: hopf-fiber-bridge-output
+    path: hopf_fiber_bridge_output.txt
+    intent: "Output from Hopf fiber bridge simulation — reference results for validation"
+    scope: "simulation output"
+    audience: ["engineer"]
+    validated: true
+    depends_on: [hopf-fiber-bridge]
+    hints:
+      load_strategy: lazy
+      token_estimate: 100
+      priority: low
+
+  - id: hopf-vs-binary
+    path: hopf_vs_binary_targeted.py
+    intent: "Direct comparison of Hopf (ternary) vs binary gate performance in error correction"
+    scope: "performance comparison — Hopf vs binary"
+    audience: ["engineer", "physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "binary vs ternary"
+      - "Hopf vs binary"
+      - "performance comparison"
+
+  - id: hopf-step-function
+    path: hopf_step_function_deconfounded.py
+    intent: "Step function analysis deconfounding Hopf geometry from error model artifacts"
+    scope: "spinor geometry — deconfounding"
+    audience: ["physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 100
+      priority: low
+
+  - id: hopf-dimension-sweep
+    path: hopf_dimension_sweep.py
+    intent: "Sweeps Hopf fiber dimensions — verifies hexagonal geometry is dimension-stable"
+    scope: "spinor geometry — dimension sweep"
+    audience: ["physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 100
+      priority: low
+
+  - id: intrinsic-torus-proof
+    path: intrinsic_torus_proof.py
+    intent: "Proves the Eisenstein torus arises intrinsically from spinor algebra, not engineering choice"
+    scope: "spinor geometry — torus derivation"
+    audience: ["mathematician", "physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "Eisenstein torus"
+      - "torus"
+      - "intrinsic geometry"
+
+  # EISENSTEIN LATTICE AND LATTICE SCALING
+  - id: eisenstein-torus-simulation
+    path: eisenstein_torus_simulation.py
+    intent: "Simulates error correction on the Eisenstein torus; measures intra-unit suppression factor"
+    scope: "Eisenstein lattice — torus simulation"
+    audience: ["physicist", "engineer"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "Eisenstein lattice"
+      - "Eisenstein torus"
+      - "intra-unit correction"
+      - "suppression factor"
+
+  - id: eisenstein-torus-output
+    path: eisenstein_torus_output.txt
+    intent: "Output from Eisenstein torus simulation — reference suppression factors"
+    scope: "simulation output"
+    audience: ["engineer"]
+    validated: true
+    depends_on: [eisenstein-torus-simulation]
+    hints:
+      load_strategy: lazy
+      token_estimate: 100
+      priority: low
+
+  - id: lattice-scaling
+    path: lattice_scaling_simulation.py
+    intent: "Lattice size scaling analysis — how error suppression scales with lattice L"
+    scope: "Eisenstein lattice — scaling"
+    audience: ["physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+
+  # ERROR CORRECTION
+  - id: noise-model-decomposition
+    path: noise_model_decomposition.py
+    intent: "Decomposes noise model into three layers: intra-unit (torus), inter-unit (torsion), π-lock"
+    scope: "error correction — noise decomposition"
+    audience: ["engineer", "physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: high
+    triggers:
+      - "error correction"
+      - "noise model"
+      - "three layers"
+      - "pi-lock"
+
+  - id: multi-merkabit-noise
+    path: multi_merkabit_cell_noise.py
+    intent: "Multi-cell noise simulation — error propagation across merkabit array"
+    scope: "error correction — multi-cell"
+    audience: ["engineer"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "multi-cell"
+      - "error propagation"
+      - "array"
+
+  - id: exponential-suppression-proof
+    path: exponential_suppression_proof.py
+    intent: "Proves exponential error suppression from torsion channel geometry"
+    scope: "error correction — exponential suppression"
+    audience: ["mathematician", "physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "exponential suppression"
+      - "error suppression proof"
+
+  - id: suppression-scaling
+    path: suppression_scaling_simulation.py
+    intent: "Scaling simulation for error suppression vs system size"
+    scope: "error correction — suppression scaling"
+    audience: ["engineer"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+
+  - id: suppression-scaling-corrected
+    path: suppression_scaling_corrected.py
+    intent: "Corrected version of suppression scaling — fixes boundary condition artefact"
+    scope: "error correction — corrected scaling"
+    audience: ["engineer"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+
+  - id: suppression-scaling-output
+    path: suppression_scaling_output.txt
+    intent: "Output from corrected suppression scaling simulation"
+    scope: "simulation output"
+    audience: ["engineer"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 100
+      priority: low
+
+  # E6 SYNDROME DECODER
+  - id: e6-syndrome-decoder
+    path: e6_syndrome_decoder_simulation.py
+    intent: "Syndrome decoder based on E6 root system — maps error syndromes to E6 lattice points"
+    scope: "error correction — E6 decoder"
+    audience: ["engineer", "mathematician"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 200
+      priority: medium
+    triggers:
+      - "E6"
+      - "syndrome decoder"
+      - "Coxeter"
+
+  - id: e6-vs-published
+    path: e6_vs_published_data.py
+    intent: "Compares E6 decoder performance against published surface code and toric code benchmarks"
+    scope: "error correction — benchmark comparison"
+    audience: ["engineer"]
+    validated: true
+    depends_on: [e6-syndrome-decoder]
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "benchmark"
+      - "surface code comparison"
+      - "toric code"
+
+  # GATE SIMULATIONS AND OPTIMIZATION
+  - id: optimal-gate-assignment
+    path: optimal_gate_assignment.py
+    intent: "Determines optimal gate assignment for the five native gates across architectural sectors"
+    scope: "gate optimization"
+    audience: ["engineer"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "gate assignment"
+      - "five gates"
+      - "R S T Z6 Z62"
+
+  - id: pf-gate-simulation
+    path: pf_gate_simulation.py
+    intent: "Simulation of PF (phase-flip) gate — boundary between binary and ternary sectors"
+    scope: "gate simulation — PF gate"
+    audience: ["engineer", "physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "phase flip"
+      - "PF gate"
+      - "boundary"
+
+  - id: gateaware-decoder
+    path: gateaware_decoder_simulation.py
+    intent: "Gate-aware decoder — exploits native gate structure for improved decoding"
+    scope: "error correction — gate-aware decoding"
+    audience: ["engineer"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+
+  # COUPLING AND COUPLING CONSTANTS
+  - id: cswap-coupling
+    path: cswap_coupling_simulation.py
+    intent: "Controlled-SWAP coupling simulation between binary and ternary sectors"
+    scope: "inter-sector coupling"
+    audience: ["engineer", "physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+
+  - id: cswap-dimensional-coupling
+    path: cswap_dimensional_coupling.py
+    intent: "Dimensional analysis of CSWAP coupling — derives coupling constant from architecture"
+    scope: "coupling constants"
+    audience: ["physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+
+  # EXTENDED GEOMETRY — TESSERACT AND OCTERACT
+  - id: pentachoric-simulation
+    path: dynamic_pentachoric_simulation.py
+    intent: "4-simplex (pentachoron) simulation — V=5 vertex geometry underlies α normalisation"
+    scope: "extended geometry — pentachoron"
+    audience: ["mathematician", "physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: high
+    triggers:
+      - "pentachoron"
+      - "4-simplex"
+      - "normalisation"
+      - "V=5"
+      - "V=10"
+
+  - id: pentachoric-code
+    path: pentachoric_code_simulation.py
+    intent: "Quantum error correcting code on pentachoric geometry"
+    scope: "error correction — pentachoric code"
+    audience: ["engineer", "mathematician"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+
+  - id: pentachoric-decoder
+    path: pentachoric_decoder_simulation.py
+    intent: "Decoder for pentachoric quantum code"
+    scope: "error correction — pentachoric decoder"
+    audience: ["engineer"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+
+  - id: tesseract-simulation
+    path: tesseract_merkabit_simulation.py
+    intent: "Merkabit simulation on tesseract (4D hypercube) geometry"
+    scope: "extended geometry — tesseract"
+    audience: ["mathematician", "physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+    triggers:
+      - "tesseract"
+      - "4D hypercube"
+
+  - id: octeract-simulation
+    path: octeract_merkabit_simulation.py
+    intent: "Merkabit simulation on octeract (8D hypercube) geometry — connection to octonions"
+    scope: "extended geometry — octeract"
+    audience: ["mathematician"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+
+  # ALGEBRAIC EXTENSIONS — SEDENIONS AND OCTONIONS
+  - id: sedenion-final
+    path: sedenion_final_analysis.py
+    intent: "Final sedenion analysis — 16D non-associative algebra, zero divisors, merkabit embedding"
+    scope: "algebraic extensions — sedenions"
+    audience: ["mathematician"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+    triggers:
+      - "sedenion"
+      - "16D"
+      - "zero divisors"
+
+  - id: sedenion-16x16
+    path: sedenion_merkabit_16x16.py
+    intent: "16×16 sedenion-merkabit representation matrix"
+    scope: "algebraic extensions — sedenion matrix"
+    audience: ["mathematician"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 100
+      priority: low
+
+  - id: sedenion-norm
+    path: sedenion_norm_analytical.py
+    intent: "Analytical norm for sedenions — verifies non-zero norm despite zero divisors"
+    scope: "algebraic extensions — sedenion norm"
+    audience: ["mathematician"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 100
+      priority: low
+
+  - id: sedenion-zero-divisors
+    path: sedenion_zero_divisors.py
+    intent: "Constructs explicit zero divisors in sedenion algebra"
+    scope: "algebraic extensions — zero divisors"
+    audience: ["mathematician"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 100
+      priority: low
+
+  - id: octonionic-nonassociativity
+    path: octonionic_nonassociativity.py
+    intent: "Verifies octonionic non-associativity structure relevant to merkabit phase space"
+    scope: "algebraic extensions — octonions"
+    audience: ["mathematician"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 100
+      priority: low
+
+  # SPECTRAL AND THRESHOLD SIMULATIONS
+  - id: spectral-geometry
+    path: spectral_geometry_simulation.py
+    intent: "Spectral geometry simulation — eigenvalue structure of Eisenstein lattice operator"
+    scope: "spectral analysis"
+    audience: ["physicist", "mathematician"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "spectral geometry"
+      - "eigenvalue"
+      - "Eisenstein operator"
+
+  - id: threshold-sweep
+    path: threshold_sweep_simulation.py
+    intent: "Primary threshold sweep — B31 vs T75 detection rate across 14 error rates"
+    scope: "threshold analysis — primary sweep"
+    audience: ["engineer", "physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: high
+    triggers:
+      - "threshold"
+      - "B31"
+      - "T75"
+      - "detection rate"
+      - "rotation gap"
+
+  - id: threshold-sweep-output
+    path: threshold_sweep_output.txt
+    intent: "Output from threshold sweep — 86.1% (B31) vs 98.7% (T75) reference values"
+    scope: "simulation output"
+    audience: ["engineer"]
+    validated: true
+    depends_on: [threshold-sweep]
+    hints:
+      load_strategy: lazy
+      token_estimate: 100
+      priority: medium
+
+  - id: three-level-threshold
+    path: three_level_threshold_sweep.py
+    intent: "Three-level (ternary) threshold sweep — full T75 sector analysis"
+    scope: "threshold analysis — three-level"
+    audience: ["engineer"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+
+  - id: three-level-threshold-output
+    path: three_level_threshold_output.txt
+    intent: "Output from three-level threshold sweep"
+    scope: "simulation output"
+    audience: ["engineer"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 100
+      priority: low
+
+  - id: tetrahedral-spectroscopy
+    path: tetrahedral_spectroscopy_prediction.py
+    intent: "Predicts spectroscopic signatures of binary tetrahedral group in physical observables"
+    scope: "spectral predictions"
+    audience: ["physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+
+  # LANGLANDS CORRESPONDENCE
+  - id: langlands-triple
+    path: langlands_triple_test.py
+    intent: "Tests Langlands triple correspondence between PSL(2,7), Klein quartic, and modular forms"
+    scope: "Langlands correspondence"
+    audience: ["mathematician"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+    triggers:
+      - "Langlands"
+      - "modular forms"
+      - "Klein quartic"
+
+  # FLOQUET AND TIME CRYSTALS
+  - id: floquet-time-crystal
+    path: floquet_time_crystal.py
+    intent: "Floquet simulation — merkabit as discrete time crystal; connection to DTC experiments"
+    scope: "time crystal physics"
+    audience: ["physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "Floquet"
+      - "time crystal"
+      - "DTC"
+
+  # EULER DEFICIT AND CURVATURE
+  - id: euler-deficit
+    path: Euler_deficit_theorem_ simulation.py
+    intent: "Euler deficit theorem simulation — topological curvature of merkabit lattice"
+    scope: "topological geometry — Euler deficit"
+    audience: ["mathematician"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+    triggers:
+      - "Euler deficit"
+      - "curvature"
+      - "topology"
+
+  # STANDING WAVE AND CUBIC SELF-ASSEMBLY
+  - id: standing-wave-breaking
+    path: standing_wave_breaking.py
+    intent: "Symmetry breaking in merkabit standing wave — mechanism for B31/T75 sector separation"
+    scope: "standing wave physics"
+    audience: ["physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: medium
+    triggers:
+      - "standing wave"
+      - "symmetry breaking"
+      - "B31 T75 separation"
+
+  - id: cubic-self-assembly
+    path: cubic_self_assembly.py
+    intent: "Cubic self-assembly simulation — how merkabit units spontaneously organize into cubic lattice"
+    scope: "self-assembly"
+    audience: ["physicist", "engineer"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+
+  - id: cubic-self-assembly-v2
+    path: cubic_self_assembly_v2.py
+    intent: "Improved cubic self-assembly with thermal fluctuation model"
+    scope: "self-assembly — v2"
+    audience: ["physicist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 150
+      priority: low
+
+  # NATIVE ALGORITHM BENCHMARKS
+  - id: native-algorithm-benchmarks
+    path: native_algorithm_benchmarks.py
+    intent: "Benchmarks native ternary algorithms (merkabit) vs binary (qubit) — complexity and gate count"
+    scope: "algorithm benchmarks"
+    audience: ["engineer", "computer scientist"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 200
+      priority: medium
+    triggers:
+      - "benchmark"
+      - "algorithm complexity"
+      - "native algorithm"
+      - "gate count"
+
+  # EXPERIMENTAL PROTOCOL
+  - id: experimental-protocol
+    path: experimental_protocol.docx
+    intent: "Physical experimental protocol for constructing and testing a merkabit — lab procedures"
+    scope: "experimental implementation"
+    audience: ["experimental physicist", "engineer"]
+    validated: true
+    hints:
+      load_strategy: lazy
+      token_estimate: 300
+      priority: medium
+    triggers:
+      - "experimental"
+      - "physical implementation"
+      - "lab"
+      - "hardware"
+
+# ─── RELATIONSHIPS ────────────────────────────────────────────────────────────
+relationships:
+  - from: alpha-berry-phase
+    to: alpha-berry-deep-dive
+    type: extends
+
+  - from: alpha-berry-phase
+    to: ouroboros-berry-phase
+    type: related
+
+  - from: hopf-fiber-bridge
+    to: intrinsic-torus-proof
+    type: supports
+
+  - from: intrinsic-torus-proof
+    to: eisenstein-torus-simulation
+    type: precedes
+
+  - from: threshold-sweep
+    to: three-level-threshold
+    type: related
+
+  - from: e6-syndrome-decoder
+    to: e6-vs-published
+    type: precedes
+
+  - from: noise-model-decomposition
+    to: multi-merkabit-noise
+    type: precedes
+
+  - from: pentachoric-simulation
+    to: alpha-berry-phase
+    type: supports
+    note: "V=5 pentachoron provides normalisation for Berry phase integral"
+
+  - from: merkabit-verification
+    to: threshold-sweep
+    type: includes
+
+  - from: merkabit-verification
+    to: algebraic-closure
+    type: includes
